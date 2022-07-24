@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% import 'bootstrap/wtf.html' as wtf %}
+
+{% block app_content %}
+    <h1>
+        {% if tracker_id %}
+            Edit
+        {% else %}
+            Track
+        {% endif %}
+        Your Progress for {{ anime.title }}
+    </h1>
+    <div class="row">
+        <div class="col-md-4">
+            <img src="{{ anime.image_url }}" alt="{{ anime.title }}">
+        </div>
+        <div class="col-md-4">
+            {{ wtf.quick_form(tracker_form, button_map={'submit': 'warning'}) }}
+        </div>
+    </div>
+{% endblock %}

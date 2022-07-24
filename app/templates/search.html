@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block app_content %}
+    <h1>Search Results</h1>
+    <table class="table table-hover">
+        <tr valign="top" class="row">
+            <th class="col-md-2">Image</th>
+            <th class="col-md-8">Title</th>
+            <th class="col-md-1">Episodes</th>
+            <th class="col-md-1"></th>
+        </tr>
+    </table>
+    {% for anime in animes %}
+        {% include '_anime.html' %}
+    {% endfor %}
+    <nav>
+        <ul class="pager">
+            <li class="previous{% if not prev_offset %} disabled{% endif %}">
+                <a href="{{ url_for('main.search', q=q, offset=prev_offset) if prev_offset else '#' }}">
+                    <span aria-hidden="true">&larr;</span> Previous results
+                </a>
+            </li>
+            <li class="next{% if not next_offset %} disabled{% endif %}">
+                <a href="{{ url_for('main.search', q=q, offset=next_offset) if next_offset else '#' }}">
+                    Next results <span aria-hidden="true">&rarr;</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+{% endblock %}
