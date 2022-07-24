@@ -12,4 +12,4 @@ class Config(object):
     MAL_BASE_URL = os.environ.get('MAL_BASE_URL')
     MAL_HEADERS = {'X-MAL-CLIENT-ID': os.environ.get('MAL_CLIENT_ID')}
     ANIMES_PER_PAGE = 10
-    TRACKERS_PER_PAGE = 1
+    TRACKERS_PER_PAGE = 10

@@ -31,13 +31,6 @@ class TrackerForm(FlaskForm):
         super(TrackerForm, self).__init__(*args, **kwargs)
         self.anime = anime
 
-    def validate_watched_episodes(self, watched_episodes):
-        if watched_episodes.data is not None:
-            if watched_episodes.data < 0:
-                raise ValidationError('Watched episodes cannot be negative.')
-            elif self.anime.total_episodes != 0 and watched_episodes.data > self.anime.total_episodes:
-                raise ValidationError(f'Watched episodes cannot exceed {self.anime.total_episodes} episodes.')
-
 
 class DeleteForm(FlaskForm):
     submit = SubmitField('Delete')

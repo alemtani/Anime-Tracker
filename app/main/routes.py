@@ -118,6 +118,12 @@ def track(anime_id):
         return redirect(url_for('main.index'))
     tracker_form = TrackerForm(anime)
     if tracker_form.validate_on_submit():
+        if tracker_form.watched_episodes.data < 0:
+            flash('Watched episodes cannot be negative.')
+            return redirect(url_for('main.track', anime_id=anime_id))
+        if tracker_form.watched_episodes.data > anime.total_episodes:
+            flash(f'Watched episodes cannot exceed {anime.total_episodes}.')
+            return redirect(url_for('main.track', anime_id=anime_id))
         if tracker_form.start_date.data > tracker_form.end_date.data:
             flash('Start date cannot be pased end date.')
             return redirect(url_for('main.track', anime_id=anime_id))
@@ -143,6 +149,12 @@ def edit_tracker(tracker_id):
     tracker = Tracker.query.filter_by(id=tracker_id).first_or_404()
     tracker_form = TrackerForm(tracker.anime)
     if tracker_form.validate_on_submit():
+        if tracker_form.watched_episodes.data < 0:
+            flash('Watched episodes cannot be negative.')
+            return redirect(url_for('main.edit_tracker', tracker_id=tracker_id))
+        if tracker_form.watched_episodes.data > tracker.anime.total_episodes:
+            flash(f'Watched episodes cannot exceed {tracker.anime.total_episodes}.')
+            return redirect(url_for('main.edit_tracker', tracker_id=tracker_id))
         if tracker_form.start_date.data > tracker_form.end_date.data:
             flash('Start date cannot be pased end date.')
             return redirect(url_for('main.edit_tracker', tracker_id=tracker_id))

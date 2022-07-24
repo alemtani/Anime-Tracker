@@ -14,8 +14,31 @@
         <div class="col-md-4">
             <img src="{{ anime.image_url }}" alt="{{ anime.title }}">
         </div>
-        <div class="col-md-4">
-            {{ wtf.quick_form(tracker_form, button_map={'submit': 'warning'}) }}
+        <div class="col-md-8">
+            <form action="" class="form form-horizontal" method="post" role="form">
+                {{ tracker_form.hidden_tag() }}
+                {{ wtf.form_errors(tracker_form, hiddens="only") }}
+                <div class="form-group">
+                    <label for="watched_episodes" class="control-label">Episodes Watched {% if anime.total_episodes > 0 %}(Max: {{ anime.total_episodes }}){% endif %}</label>
+                    <input type="number" class="form-control" id="watched_episodes" name="watched_episodes" value="{{ tracker_form.watched_episodes.data }}">
+                </div>
+                {{ wtf.form_field(tracker_form.start_date) }}
+                {{ wtf.form_field(tracker_form.end_date) }}
+                {{ wtf.form_field(tracker_form.status) }}
+                {% if tracker_id %}
+                    <div class="form-group">
+                        {{ wtf.form_field(tracker_form.submit, button_map={'submit': 'warning'}) }}
+                        <input type="submit" class="btn btn-danger" name="submit" type="submit" value="Delete" form="delete-form">
+                    </div>
+                {% else %}
+                    {{ wtf.form_field(tracker_form.submit, button_map={'submit': 'primary'}) }}
+                {% endif %}
+            </form>
+            {% if delete_form %}
+                <form id="delete-form" action="{{ url_for('main.delete_tracker', tracker_id=tracker_id) }}" method="post">
+                    {{ delete_form.hidden_tag() }}
+                </form>
+            {% endif %}
         </div>
     </div>
 {% endblock %}
