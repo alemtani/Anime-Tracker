@@ -1,13 +1,12 @@
 from datetime import date
 from flask import request
 from flask_wtf import FlaskForm
-from wtforms import DateField, IntegerField, SelectField, StringField, SubmitField
-from wtforms.validators import DataRequired, ValidationError
+from wtforms import DateField, IntegerField, SelectField, SearchField, SubmitField
+from wtforms.validators import DataRequired, Optional
 
 
 class SearchForm(FlaskForm):
-    q = StringField('Search Anime', validators=[DataRequired()])
-    submit = SubmitField('Search')
+    q = SearchField('Search Anime', validators=[DataRequired()])
 
     def __init__(self, *args, **kwargs):
         if 'formdata' not in kwargs:
@@ -21,9 +20,9 @@ class TrackerForm(FlaskForm):
     def max_episodes(self):
         return self.anime.total_episodes
     
-    watched_episodes = IntegerField('Episodes Watched', default=0)
-    start_date = DateField('Start Date', default=date.today)
-    end_date = DateField('End Date', default=date.today)
+    watched_episodes = IntegerField('Episodes Watched', default=0, validators=[Optional()])
+    start_date = DateField('Start Date', default=date.today, validators=[Optional()])
+    end_date = DateField('End Date', default=date.today, validators=[Optional()])
     status = SelectField('Status', choices=['Watching', 'Completed', 'Holding', 'Dropped', 'Planning'])
     submit = SubmitField('Submit')
 

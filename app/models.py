@@ -1,7 +1,7 @@
 import enum
 
 from app import db, login
-from datetime import date
+from datetime import date, datetime
 from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -37,9 +37,10 @@ class Anime(db.Model):
 class Tracker(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     watched_episodes = db.Column(db.Integer, default=0)
-    start_date = db.Column(db.Date, default=date.today)
-    end_date = db.Column(db.Date, default=date.today)
+    start_date = db.Column(db.Date, nullable=True)
+    end_date = db.Column(db.Date, nullable=True)
     status = db.Column(db.String(20), default='Watching')
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     anime_id = db.Column(db.Integer, db.ForeignKey('anime.id'))
 

@@ -4,7 +4,7 @@
 {% block app_content %}
     <h1>Welcome to Anime Tracker, {{ current_user.username }}!</h1>
     <div class="search">
-        {{ wtf.quick_form(search_form, action=url_for('main.search'), method='get', form_type='inline') }}
+        {{ wtf.quick_form(search_form, action=url_for('main.search'), method='get') }}
     </div>
     <ul class="nav nav-tabs nav-justified">
         <li role="presentation" class="{% if not status %}active{% endif %}">

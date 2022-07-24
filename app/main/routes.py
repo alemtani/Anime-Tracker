@@ -4,6 +4,7 @@ from app import db
 from app.main import bp
 from app.main.forms import DeleteForm, SearchForm, TrackerForm
 from app.models import Anime, Tracker
+from datetime import datetime
 from flask import current_app, flash, redirect, render_template, request, url_for
 from flask_login import current_user, login_required
 from urllib.parse import parse_qs, urlparse
@@ -28,9 +29,9 @@ def index():
             # Check if there is a tracker
             flash(f'No tracker found with the status: {status}')
             return redirect(url_for('main.index', page=page))
-    # Order by most recent (by end date and then by start date)
-    trackers = trackers.order_by(Tracker.end_date.desc(), 
-        Tracker.start_date.desc()).paginate(page, current_app.config['TRACKERS_PER_PAGE'], False)
+    # Order by most recently updated
+    trackers = trackers.order_by(Tracker.timestamp.desc()).paginate(
+        page, current_app.config['TRACKERS_PER_PAGE'], False)
     next_url = url_for('main.index', page=trackers.next_num, status=status) if trackers.has_next else None
     prev_url = url_for('main.index', page=trackers.prev_num, status=status) if trackers.has_prev else None
     return render_template('index.html', title='Home', delete_form=delete_form, 
@@ -118,13 +119,15 @@ def track(anime_id):
         return redirect(url_for('main.index'))
     tracker_form = TrackerForm(anime)
     if tracker_form.validate_on_submit():
+        if tracker_form.watched_episodes.data is None:
+            tracker_form.watched_episodes.data = 0
         if tracker_form.watched_episodes.data < 0:
             flash('Watched episodes cannot be negative.')
             return redirect(url_for('main.track', anime_id=anime_id))
-        if tracker_form.watched_episodes.data > anime.total_episodes:
+        if anime.total_episodes != 0 and tracker_form.watched_episodes.data > anime.total_episodes:
             flash(f'Watched episodes cannot exceed {anime.total_episodes}.')
             return redirect(url_for('main.track', anime_id=anime_id))
-        if tracker_form.start_date.data > tracker_form.end_date.data:
+        if tracker_form.start_date.data is not None and tracker_form.end_date.data is not None and tracker_form.start_date.data > tracker_form.end_date.data:
             flash('Start date cannot be pased end date.')
             return redirect(url_for('main.track', anime_id=anime_id))
         tracker = Tracker(user=current_user, anime=anime, 
@@ -149,19 +152,22 @@ def edit_tracker(tracker_id):
     tracker = Tracker.query.filter_by(id=tracker_id).first_or_404()
     tracker_form = TrackerForm(tracker.anime)
     if tracker_form.validate_on_submit():
+        if tracker_form.watched_episodes.data is None:
+            tracker_form.watched_episodes.data = 0
         if tracker_form.watched_episodes.data < 0:
             flash('Watched episodes cannot be negative.')
             return redirect(url_for('main.edit_tracker', tracker_id=tracker_id))
-        if tracker_form.watched_episodes.data > tracker.anime.total_episodes:
+        if tracker.anime.total_episodes != 0 and tracker_form.watched_episodes.data > tracker.anime.total_episodes:
             flash(f'Watched episodes cannot exceed {tracker.anime.total_episodes}.')
             return redirect(url_for('main.edit_tracker', tracker_id=tracker_id))
-        if tracker_form.start_date.data > tracker_form.end_date.data:
+        if tracker_form.start_date.data is not None and tracker_form.end_date.data is not None and tracker_form.start_date.data > tracker_form.end_date.data:
             flash('Start date cannot be pased end date.')
             return redirect(url_for('main.edit_tracker', tracker_id=tracker_id))
         tracker.watched_episodes = tracker_form.watched_episodes.data
         tracker.start_date = tracker_form.start_date.data
         tracker.end_date = tracker_form.end_date.data
         tracker.status = tracker_form.status.data
+        tracker.timestamp = datetime.utcnow()
         db.session.commit()
         flash(f'You updated your progress for { tracker.anime.title }!')
         return redirect(url_for('main.index'))
